@@ -84,12 +84,12 @@ class _LoginScreenState extends State<LoginScreen> {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('staff')
           .where('email', isEqualTo: email)
-          .where('password', isEqualTo: password) // ⚠️ Hash in real apps
+          .where('password', isEqualTo: password) // ⚠ Hash in real apps
           .get();
 
       if (snapshot.docs.isNotEmpty) {
         var staffDoc = snapshot.docs.first;
-        String staffId = staffDoc['id']; // UUID
+        String staffId = staffDoc['id']; // ✅ from 'id' field in the document
 
         // Update status to online
         await FirebaseFirestore.instance
@@ -101,10 +101,12 @@ class _LoginScreenState extends State<LoginScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text("Login successful")));
 
-        // Navigate to main dashboard
+        // Navigate to main dashboard and pass staffId
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainDashboard()),
+          MaterialPageRoute(
+            builder: (context) => MainDashboard(staffId: staffId),
+          ),
         );
       } else {
         ScaffoldMessenger.of(

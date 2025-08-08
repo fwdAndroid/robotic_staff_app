@@ -1,13 +1,19 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:robotic_staff_app/screens/main/pages/account_screen.dart';
 import 'package:robotic_staff_app/screens/main/pages/user_request_screen.dart';
 
 class MainDashboard extends StatefulWidget {
-  final int initialPageIndex; // new
+  final String staffId; // Pass the staff document ID
+  final int initialPageIndex;
 
-  const MainDashboard({super.key, this.initialPageIndex = 0});
+  const MainDashboard({
+    super.key,
+    this.initialPageIndex = 0,
+    required this.staffId,
+  });
 
   @override
   State<MainDashboard> createState() => _MainDashboardState();
@@ -15,15 +21,18 @@ class MainDashboard extends StatefulWidget {
 
 class _MainDashboardState extends State<MainDashboard> {
   int _currentIndex = 0;
+  late List<Widget> _screens;
 
-  final List<Widget> _screens = [
-    RequestsScreen(), // Replace with your screen widgets
-    AccountScreen(),
-  ];
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialPageIndex;
+
+    // Initialize screens with the correct staffId
+    _screens = [
+      UserRequestScreen(staffId: widget.staffId),
+      const AccountScreen(),
+    ];
   }
 
   @override
@@ -38,7 +47,7 @@ class _MainDashboardState extends State<MainDashboard> {
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Colors.blue,
           selectedItemColor: Colors.white,
-          selectedLabelStyle: TextStyle(color: Colors.white),
+          selectedLabelStyle: const TextStyle(color: Colors.white),
           type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex,
           onTap: (index) {
@@ -46,12 +55,11 @@ class _MainDashboardState extends State<MainDashboard> {
               _currentIndex = index;
             });
           },
-          items: [
+          items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.person_2, size: 25, color: Color(0xff0A5EFE)),
               label: "Users",
             ),
-
             BottomNavigationBarItem(
               label: "Account",
               icon: Icon(Icons.settings, size: 25, color: Color(0xff0A5EFE)),
@@ -66,22 +74,22 @@ class _MainDashboardState extends State<MainDashboard> {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Exit App'),
-        content: Text('Do you want to exit the app?'),
+        title: const Text('Exit App'),
+        content: const Text('Do you want to exit the app?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'),
+            child: const Text('No'),
           ),
           TextButton(
             onPressed: () {
               if (Platform.isAndroid) {
-                SystemNavigator.pop(); // For Android
+                SystemNavigator.pop();
               } else if (Platform.isIOS) {
-                exit(0); // For iOS
+                exit(0);
               }
             },
-            child: Text('Yes'),
+            child: const Text('Yes'),
           ),
         ],
       ),
