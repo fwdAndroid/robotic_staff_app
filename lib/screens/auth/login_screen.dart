@@ -90,6 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (snapshot.docs.isNotEmpty) {
         var staffDoc = snapshot.docs.first;
         String staffId = staffDoc['id']; // ✅ from 'id' field in the document
+        String staffName = staffDoc['name'] ?? 'Unknown';
 
         // Update status to online
         await FirebaseFirestore.instance
@@ -105,7 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => MainDashboard(staffId: staffId),
+            builder: (context) =>
+                MainDashboard(staffId: staffId, staffName: staffName),
           ),
         );
       } else {

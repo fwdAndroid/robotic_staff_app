@@ -8,11 +8,13 @@ import 'package:robotic_staff_app/screens/main/pages/user_request_screen.dart';
 class MainDashboard extends StatefulWidget {
   final String staffId; // Pass the staff document ID
   final int initialPageIndex;
+  final String staffName;
 
   const MainDashboard({
     super.key,
     this.initialPageIndex = 0,
     required this.staffId,
+    required this.staffName,
   });
 
   @override
@@ -30,7 +32,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
     // Initialize screens with the correct staffId
     _screens = [
-      UserRequestScreen(staffId: widget.staffId),
+      UserRequestScreen(staffId: widget.staffId, staffName: widget.staffName),
       const AccountScreen(),
     ];
   }
