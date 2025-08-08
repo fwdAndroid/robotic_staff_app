@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:robotic_staff_app/screens/chat/video_chat.dart';
 
 class UserRequestScreen extends StatefulWidget {
   final String staffId; // pass the staff document ID
@@ -97,7 +98,21 @@ class _UserRequestScreenState extends State<UserRequestScreen> {
                       title: Text(userData['username'] ?? 'No Name'),
                       subtitle: Text(userData['email'] ?? 'No Email'),
                       trailing: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) => VideoChat(
+                                callID: widget.staffId,
+                                staffName: widget.staffName,
+                                staffId: widget.staffId,
+                                userId:
+                                    userData['uid'], // Replace with actual user ID
+                                userName: userData['username'],
+                              ),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "Join",
                           style: TextStyle(color: Colors.white),
