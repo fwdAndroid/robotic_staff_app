@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class RequestPasswordScreen extends StatefulWidget {
-  const RequestPasswordScreen({super.key});
+  final String staffId; // Add staffId here
+
+  const RequestPasswordScreen({super.key, required this.staffId});
 
   @override
   State<RequestPasswordScreen> createState() => _RequestPasswordScreenState();
@@ -23,6 +25,7 @@ class _RequestPasswordScreenState extends State<RequestPasswordScreen> {
 
     try {
       await FirebaseFirestore.instance.collection('password_requests').add({
+        'staffId': widget.staffId, // <-- Include staffId here
         'name': _nameController.text.trim().isEmpty
             ? null
             : _nameController.text.trim(),
@@ -74,7 +77,7 @@ class _RequestPasswordScreenState extends State<RequestPasswordScreen> {
                   labelText: 'Name (Optional)',
                   border: OutlineInputBorder(),
                 ),
-                validator: (_) => null, // No validation for name
+                validator: (_) => null,
               ),
               const SizedBox(height: 16),
               TextFormField(

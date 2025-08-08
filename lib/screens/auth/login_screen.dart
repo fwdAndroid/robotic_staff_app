@@ -14,75 +14,88 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(child: Image.asset('assets/logo.png', height: 200)),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            Center(child: Image.asset('assets/logo.png', height: 200)),
+            const SizedBox(height: 20),
+            TextField(
               controller: emailController,
-              decoration: InputDecoration(labelText: "Email"),
+              decoration: const InputDecoration(labelText: "Email"),
+              keyboardType: TextInputType.emailAddress,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
+            const SizedBox(height: 12),
+            TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: "Password"),
+              decoration: const InputDecoration(labelText: "Password"),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextButton(
-              onPressed: () {
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () async {
+                String email = emailController.text.trim();
+                if (email.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Please enter your email")),
+                  );
+                  return;
+                }
+
+                // Query staff collection for staffId by email
+                QuerySnapshot snapshot = await FirebaseFirestore.instance
+                    .collection('staff')
+                    .where('email', isEqualTo: email)
+                    .get();
+
+                String? staffId;
+                if (snapshot.docs.isNotEmpty) {
+                  staffId =
+                      snapshot.docs.first.id; // Firestore document ID here
+                }
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const RequestPasswordScreen(),
+                    builder: (context) =>
+                        RequestPasswordScreen(staffId: staffId!),
                   ),
                 );
               },
-              child: Text(
-                ("Request Password?"),
+              child: const Text(
+                "Request Password?",
                 style: TextStyle(color: Color(0xff0A5EFE)),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: isLoading
-                ? CircularProgressIndicator()
+            const SizedBox(height: 12),
+            isLoading
+                ? const CircularProgressIndicator()
                 : ElevatedButton(
-                    onPressed: () {
-                      loginAdmin();
-                    },
-                    child: Text("Login", style: TextStyle(color: Colors.white)),
+                    onPressed: loginAdmin,
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-
-                      backgroundColor: Color(0xff0A5EFE),
-                      fixedSize: Size(285, 54),
+                      backgroundColor: const Color(0xff0A5EFE),
+                      fixedSize: const Size(285, 54),
                     ),
                   ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-  //Functions
 
   Future<void> loginAdmin() async {
     String email = emailController.text.trim();
@@ -90,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter email and password")),
+        const SnackBar(content: Text("Please enter email and password")),
       );
       return;
     }
@@ -101,12 +114,15 @@ class _LoginScreenState extends State<LoginScreen> {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('staff')
           .where('email', isEqualTo: email)
-          .where('password', isEqualTo: password) // ⚠ Hash in real apps
+          .where(
+            'password',
+            isEqualTo: password,
+          ) // ⚠️ Use hashed password in real apps
           .get();
 
       if (snapshot.docs.isNotEmpty) {
         var staffDoc = snapshot.docs.first;
-        String staffId = staffDoc['id']; // ✅ from 'id' field in the document
+        String staffId = staffDoc.id; // Firestore document ID
         String staffName = staffDoc['name'] ?? 'Unknown';
 
         // Update status to online
@@ -117,9 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Login successful")));
+        ).showSnackBar(const SnackBar(content: Text("Login successful")));
 
-        // Navigate to main dashboard and pass staffId
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -130,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Invalid credentials")));
+        ).showSnackBar(const SnackBar(content: Text("Invalid credentials")));
       }
     } catch (e) {
       ScaffoldMessenger.of(
