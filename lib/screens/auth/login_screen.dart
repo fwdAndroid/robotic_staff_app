@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:robotic_staff_app/screens/auth/request_password_screen.dart';
 import 'package:robotic_staff_app/screens/main/main_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -41,7 +42,23 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(labelText: "Password"),
             ),
           ),
-
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RequestPasswordScreen(),
+                  ),
+                );
+              },
+              child: Text(
+                ("Request Password?"),
+                style: TextStyle(color: Color(0xff0A5EFE)),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: isLoading
